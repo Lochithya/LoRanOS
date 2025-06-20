@@ -6,48 +6,39 @@
 
 # --- Configuration ---
 OS_NAME="LoRanOS"
-IMAGE_DIR="disk_images"
-BOOT_DIR="boot"
-SRC_DIR="src"
-FLOPPY_IMG="disk_images/LoRanOS.flp"
-ISO_IMG="disk_images/LoRanOS.iso"
-BOOTLOADER_SRC="boot/bootload.asm"
-BOOTLOADER_BIN="boot/bootload.bin"
-KERNEL_SRC="src/kernel.asm"
-KERNEL_BIN="src/kernel.bin"
 
 # --- Create directories if they don't exist ---
-mkdir -p $IMAGE_DIR
+mkdir -p disk_images
 
 # --- Create floppy image if not exists ---
-if [ ! -e "$FLOPPY_IMG" ]; then
-    echo ">>> Creating new floppy image: $FLOPPY_IMG"
-    mkdosfs -C $FLOPPY_IMG 1440 || exit 1
+if [ ! -e "disk_images/LoRanOS.flp" ]; then
+    echo ">>> Creating new floppy image: disk_images/LoRanOS.flp"
+    mkdosfs -C disk_images/LoRanOS.flp 1440 || exit 1
 fi
 
 # --- Assemble bootloader ---
 echo ">>> Assembling bootloader..."
-nasm -f bin -o $BOOTLOADER_BIN $BOOTLOADER_SRC || exit 1
+nasm -f bin -o boot/bootload.bin boot/bootload.asm || exit 1
 
 # --- Assemble kernel ---
 echo ">>> Assembling LoRanOS kernel..."
-nasm -f bin -o $KERNEL_BIN $KERNEL_SRC || exit 1
+nasm -f bin -o src/kernel.bin src/kernel.asm || exit 1
 
 # --- Write bootloader to floppy image (first 512 bytes) ---
 echo ">>> Adding bootloader to floppy image..."
-dd status=noxfer conv=notrunc if=$BOOTLOADER_BIN of=$FLOPPY_IMG || exit 1
+dd status=noxfer conv=notrunc if=boot/bootload.bin of=disk_images/LoRanOS.flp || exit 1
 
 # --- Copy kernel file to floppy image root directory ---
 echo ">>> Copying LoRanOS kernel & programs to floppy image..."
-mcopy -o -i $FLOPPY_IMG $KERNEL_BIN ::/ || exit 1
+mcopy -o -i disk_images/LoRanOS.flp src/kernel.bin ::/ || exit 1
 
 
 # --- Create ISO image from floppy ---
 echo ">>> Creating ISO image..."
-rm -f $ISO_IMG
-mkisofs -quiet -V "LoRanOS" -input-charset iso8859-1 -o $ISO_IMG -b $(basename $FLOPPY_IMG) $IMAGE_DIR/ || exit 1
+rm -f disk_images/LoRanOS.iso
+mkisofs -quiet -V "LoRanOS" -input-charset iso8859-1 -o disk_images/LoRanOS.iso -b $(basename disk_images/LoRanOS.flp) disk_images/ || exit 1
 
-echo ">>> ✅ Build complete! ISO ready at: $ISO_IMG"
+echo ">>> ✅ Build complete! ISO ready at: disk_images/LoRanOS.iso"
 
 #!/bin/sh
 
