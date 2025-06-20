@@ -513,7 +513,7 @@ _boot_msg1      db 'Booting from Floppy...', 0
 _boot_msg2      db 'Loading Boot Image', 0
 _boot_dots      db '.................', 0
 
-_greet_msg         db 'Welcome to the paradise LoRanOS by Lochithya Hettiarachchi!', 0
+_greet_msg         db 'Welcome to a new World >> LoRanOS by Lochithya Hettiarachchi!', 0
 _prompt_msg        db 'LoRanOS $ >> ', 0
 _msg_unknown       db 'Command not recognized', 0
 _cmd_info          db 'info', 0
