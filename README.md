@@ -48,6 +48,7 @@ LoRanOS is capable of detecting and displaying the following hardware components
 
 ---
 
+
 Keep on enjoying the OS , Good Luck !
 
 
